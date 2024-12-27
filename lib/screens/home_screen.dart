@@ -174,39 +174,34 @@ class _HomeContent extends StatelessWidget {
                                   showType: title.contains('Movies')
                                       ? ShowType.movie
                                       : ShowType.tv,
-                                  fetchShows: (ShowType showType, {required int limit}) {
+                                  fetchShows: (ShowType showType,
+                                      {int page = 1, int limit = 9}) {
                                     switch (title) {
                                       case 'Most Recent Movies':
                                         return APIService.getMostRecentShows(
                                           showType,
-                                          limit: limit,
                                         );
                                       case 'Most Recent Series':
                                         return APIService.getMostRecentShows(
                                           showType,
-                                          limit: limit,
                                         );
                                       case 'Most Trending Movies':
                                         return APIService.getMostTrendingShows(
                                           showType,
-                                          limit: limit,
                                         );
                                       case 'Most Trending Series':
                                         return APIService.getMostTrendingShows(
                                           showType,
-                                          limit: limit,
                                         );
                                       case 'Recently Reviewed Movies':
                                         return APIService
                                             .getRecentlyReviewedShows(
                                           showType,
-                                          limit: limit,
                                         );
                                       case 'Recently Reviewed Series':
                                         return APIService
                                             .getRecentlyReviewedShows(
                                           showType,
-                                          limit: limit,
                                         );
                                       default:
                                         return Future.value([]);

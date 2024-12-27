@@ -44,11 +44,11 @@ class APIService {
   }
 
   static Future<List<dynamic>> getMostRecentShows(ShowType type,
-      {int limit = 6}) async {
+      {int limit = 6, int page = 1}) async {
     final endpoint =
         type == ShowType.movie ? 'movie/now_playing' : 'tv/on_the_air';
-    final response =
-        await http.get(Uri.parse('$_baseUrl/$endpoint?api_key=$_apiKey'));
+    final response = await http
+        .get(Uri.parse('$_baseUrl/$endpoint?api_key=$_apiKey&page=$page'));
     if (response.statusCode == 200) {
       final results = json.decode(response.body)['results'] as List;
       return results.take(limit).toList();
@@ -59,10 +59,10 @@ class APIService {
   }
 
   static Future<List<dynamic>> getMostTrendingShows(ShowType type,
-      {int limit = 6}) async {
+      {int limit = 6, int page = 1}) async {
     final endpoint = type == ShowType.movie ? 'movie' : 'tv';
-    final response = await http
-        .get(Uri.parse('$_baseUrl/trending/$endpoint/week?api_key=$_apiKey'));
+    final response = await http.get(Uri.parse(
+        '$_baseUrl/trending/$endpoint/week?api_key=$_apiKey&page=$page'));
     if (response.statusCode == 200) {
       final results = _checkMediaTypeAndFix(
         json.decode(response.body)['results'] as List,
@@ -75,10 +75,10 @@ class APIService {
   }
 
   static Future<List<dynamic>> getRecentlyReviewedShows(ShowType type,
-      {int limit = 6}) async {
+      {int limit = 6, int page = 1}) async {
     final endpoint = type == ShowType.movie ? 'movie' : 'tv';
-    final response = await http
-        .get(Uri.parse('$_baseUrl/$endpoint/top_rated?api_key=$_apiKey'));
+    final response = await http.get(
+        Uri.parse('$_baseUrl/$endpoint/top_rated?api_key=$_apiKey&page=$page'));
     if (response.statusCode == 200) {
       final results = _checkMediaTypeAndFix(
         json.decode(response.body)['results'] as List,

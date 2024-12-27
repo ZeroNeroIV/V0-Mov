@@ -8,7 +8,7 @@ import 'package:m0viewer/widgets/show_poster.dart';
 class SeeMoreScreen extends StatefulWidget {
   final String title;
   final ShowType showType;
-  final Future<List<dynamic>> Function(ShowType showType, {required int limit})
+  final Future<List<dynamic>> Function(ShowType showType, {int page, int limit})
       fetchShows;
 
   const SeeMoreScreen({
@@ -25,9 +25,11 @@ class SeeMoreScreen extends StatefulWidget {
 class _SeeMoreScreenState extends State<SeeMoreScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<dynamic> _shows = [];
+  int _currentPage = 1;
   int _currentLimit = 6;
   bool _isLoading = false;
   bool _hasMoreData = true;
+  List<dynamic> _lastFetchedShows = [];
 
   @override
   void initState() {
@@ -50,13 +52,22 @@ class _SeeMoreScreenState extends State<SeeMoreScreen> {
     try {
       final newShows = await widget.fetchShows(
         widget.showType,
+        page: _currentPage,
         limit: _currentLimit,
       );
-      setState(() {
-        _shows.addAll(newShows);
-        _currentLimit += 6;
-        _hasMoreData = newShows.isNotEmpty;
-      });
+      if (newShows.isEmpty || _lastFetchedShows == newShows) {
+        setState(() {
+          _hasMoreData = false;
+        });
+        return;
+      } else {
+        setState(() {
+          _shows.addAll(newShows.where((show) => !_shows.contains(show)));
+          _lastFetchedShows = newShows;
+          _currentPage++;
+          _hasMoreData = newShows.length == _currentLimit;
+        });
+      }
     } catch (error) {
       // Handle error
       print('Error fetching shows: $error');
@@ -93,8 +104,9 @@ class _SeeMoreScreenState extends State<SeeMoreScreen> {
             return Center(child: CircularProgressIndicator());
           }
           final show = _shows[index];
+          final posterPath = show['poster_path'] ?? '';
           return ShowPoster(
-            posterPath: show['posterPath'],
+            posterPath: posterPath,
             onTap: () {
               Navigator.push(
                 context,
